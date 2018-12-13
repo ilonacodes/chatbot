@@ -5,6 +5,7 @@ const initState = {
     states: [
         {
             id: 'greeting',
+            side: 'chatbot',
             message: 'Welcome to productivity app!',
             transitions: [
                 {
@@ -15,6 +16,7 @@ const initState = {
         },
         {
             id: 'do-you-like-to-try',
+            side: 'chatbot',
             message: 'We are helping you to visualize your thoughts. Do you like to try it? It is free!',
             transitions: [
                 {
@@ -29,6 +31,7 @@ const initState = {
         },
         {
             id: 'do-you-like-to-try--yes',
+            side: 'user',
             message: 'Yes',
             transitions: [
                 {
@@ -39,6 +42,7 @@ const initState = {
         },
         {
             id: 'do-you-like-to-try--more-details',
+            side: 'user',
             message: 'More Details',
             transitions: [
                 {
@@ -49,6 +53,7 @@ const initState = {
         },
         {
             id: 'more-details',
+            side: 'chatbot',
             message: 'Then, tell me please, what do you expect from the product?',
             transitions: [
                 {

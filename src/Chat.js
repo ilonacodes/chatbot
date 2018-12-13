@@ -1,6 +1,27 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {actions} from "./actions";
+import {css} from "emotion";
+
+const user = css`
+    color: blue;
+`;
+
+const chatbot = css`
+    color: green;
+`;
+
+const Message = ({state}) => {
+    if (state.side === 'user') {
+        return (
+            <div className={user}>{state.message}</div>
+        );
+    }
+
+    return (
+        <div className={chatbot}>{state.message}</div>
+    )
+};
 
 class ChatComponent extends React.Component {
     constructor(props) {
@@ -25,7 +46,7 @@ class ChatComponent extends React.Component {
 
         return (
             <div>
-                <p>{state.message}</p>
+                <Message state={state}/>
 
                 {state.transitions.filter(transition => transition.button)
                     .map(transition =>
