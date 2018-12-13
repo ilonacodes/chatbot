@@ -11,15 +11,24 @@ const chatbot = css`
     color: green;
 `;
 
-const Message = ({state}) => {
+export const renderMessage = (message, fields) => {
+    let messageWithFields = message;
+    Object.keys(fields).map(field =>
+        messageWithFields = messageWithFields.replace('$' + field + '$', fields[field])
+    );
+    return messageWithFields;
+};
+
+const Message = ({state, fields}) => {
+
     if (state.side === 'user') {
         return (
-            <div className={user}>{state.message}</div>
+            <div className={user}>{renderMessage(state.message, fields)}</div>
         );
     }
 
     return (
-        <div className={chatbot}>{state.message}</div>
+        <div className={chatbot}>{renderMessage(state.message, fields)}</div>
     )
 };
 
@@ -28,16 +37,29 @@ class ChatComponent extends React.Component {
         super(props);
 
         this.onButtonClick = this.onButtonClick.bind(this);
+        this.onInputKeyPress = this.onInputKeyPress.bind(this);
     }
 
     onButtonClick(transition) {
+        if (transition.field) {
+            this.props.updateField(transition.field, transition.button)
+        }
+
         this.props.goToNextState(transition.nextState)
     }
 
+    onInputKeyPress(e, nextState) {
+        e.preventDefault();
+        if (e.keyCode === 13) {
+            return this.props.goToNextState(nextState)
+        }
+    }
+
     render() {
-        const { states, currentState, delay } = this.props;
+        const { states, currentState, delay, updateField, fields } = this.props;
+
         const state = states.find(state => state.id === currentState);
-        console.log(state);
+
         const delayTransition = state.transitions.find(transition => transition.delay);
 
         if (delayTransition) {
@@ -46,12 +68,25 @@ class ChatComponent extends React.Component {
 
         return (
             <div>
-                <Message state={state}/>
+                <Message state={state} fields={fields}/>
 
                 {state.transitions.filter(transition => transition.button)
                     .map(transition =>
                         <button key={transition.button} onClick={() => this.onButtonClick(transition)}>{transition.button}</button>
                     )}
+                    
+                {state.transitions.filter(transition => transition.input)
+                    .map(transition =>
+                        <div key={transition.input}>
+                            {transition.label}
+                            <input type="text"
+                                   placeholder="enter it here"
+                                   onChange={e => updateField(transition.input, e.target.value)}
+                                   onKeyUp={e => this.onInputKeyPress(e, transition.nextState)}
+                            />
+                        </div>
+                    )
+                }
             </div>
         );
     }
@@ -60,7 +95,8 @@ class ChatComponent extends React.Component {
 const mapStateToProps = state => {
     return {
         states: state.states.states,
-        currentState: state.states.currentState
+        currentState: state.states.currentState,
+        fields: state.states.fields
     }
 };
 
@@ -72,7 +108,9 @@ const mapDispatchToProps = dispatch => {
             }, 1000)
         },
 
-        goToNextState: nextState => dispatch(actions.makeTransition(nextState))
+        goToNextState: nextState => dispatch(actions.makeTransition(nextState)),
+
+        updateField: (field, value) => dispatch(actions.updateField(field, value))
     }
 };
 
