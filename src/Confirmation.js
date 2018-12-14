@@ -5,7 +5,7 @@ export const Confirmation = ({fields}) => {
         <div>
             <div>You are signing up with the following info:</div>
             <div>
-                <p>{fields.name}</p>
+                <p className="name">{fields.name}</p>
                 <p>{fields.usageFor}</p>
                 <p>{fields.email}</p>
                 <p>{fields.relatedUpdates}</p>

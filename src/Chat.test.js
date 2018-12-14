@@ -1,10 +1,11 @@
 import React from 'react';
-import Enzyme, { mount } from 'enzyme';
+import Enzyme, {mount, shallow} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import {Provider} from "react-redux";
 import {Chat} from "./Chat";
 import {initStore} from "./store";
 import {actions} from "./actions";
+import {Confirmation} from "./Confirmation";
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -14,7 +15,7 @@ const waitFor = (milliseconds) => {
 
 describe('Chat', () => {
 
-    let app, store;
+    let app, store, component;
 
     beforeEach(() => {
 
@@ -182,6 +183,52 @@ describe('Chat', () => {
         const message = app.find('Message');
 
         expect(message.text()).toEqual('Yes!');
+    });
+
+    it('asks for email and uses the email in the next message', async () => {
+        store.dispatch(actions.makeTransition('where-should-I-send-tips-and-advices'));
+        app.update();
+
+        const message = app.find('Message');
+        expect(message.text()).toEqual('Where should I send tips and advices?');
+
+        const label = app.find('label');
+        expect(label.text()).toEqual('My email ');
+
+        const input = app.find('input');
+        input.simulate('change', { target: { value: 'test@example.org'}});
+        input.simulate('keyup', { keyCode: 13 });
+
+        expect(message.text()).toEqual('My email is test@example.org');
+
+        await waitFor(1100);
+        app.update();
+
+        expect(message.text()).toEqual('Thanks! Are you interested to hear about related articles and products?');
+    });
+
+    it('asks whether the user is interested to subscribe for updates, in case "Yes"', async() => {
+        store.dispatch(actions.makeTransition('related-articles-and-products'));
+        app.update();
+
+        const button = app.find('button[children="Yes"]').at(0);
+        button.simulate('click', { button: 0 });
+
+        const message = app.find('Message');
+
+        expect(message.text()).toEqual('Yes');
+    });
+
+    it('asks whether the user is interested to subscribe for updates, in case "No"', async() => {
+        store.dispatch(actions.makeTransition('related-articles-and-products'));
+        app.update();
+
+        const button = app.find('button[children="No"]').at(0);
+        button.simulate('click', { button: 0 });
+
+        const message = app.find('Message');
+
+        expect(message.text()).toEqual('No');
     });
 });
 

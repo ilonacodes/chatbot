@@ -1,8 +1,10 @@
 import {t} from "./actions";
 import {Confirmation} from "./Confirmation";
 
+
 const initState = {
     currentState: 'greeting',
+    history: [],
     fields: {},
     states: [
         {
@@ -276,10 +278,12 @@ const initState = {
             transitions: [
                 {
                     button: 'Yes',
+                    field: 'relatedUpdates',
                     nextState: 'related-articles-and-products--yes'
                 },
                 {
                     button: 'No',
+                    field: 'relatedUpdates',
                     nextState: 'related-articles-and-products--no'
                 }
             ]
@@ -329,7 +333,11 @@ export const statesReducer = (state = initState, action) => {
         case t.MAKE_TRANSITION:
             return {
                 ...state,
-                currentState: action.nextState
+                currentState: action.nextState,
+                history: [
+                    ...state.history,
+                    state.currentState
+                ],
             };
 
         case t.UPDATE_FIELD:

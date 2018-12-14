@@ -11,6 +11,15 @@ const chatbot = css`
     color: green;
 `;
 
+const container = css`
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`;
+
 export const renderMessage = (message, fields) => {
     let messageWithFields = message;
     Object.keys(fields).map(field =>
@@ -64,7 +73,7 @@ class ChatComponent extends React.Component {
     }
 
     render() {
-        const { states, currentState, delay, updateField, fields } = this.props;
+        const { states, currentState, delay, updateField, fields, history } = this.props;
 
         const state = states.find(state => state.id === currentState);
 
@@ -74,27 +83,35 @@ class ChatComponent extends React.Component {
             delay(delayTransition);
         }
 
-        return (
-            <div>
-                <Message state={state} fields={fields}/>
+        const previousStates = history.map(id => states.find(state => state.id === id));
 
-                {state.transitions.filter(transition => transition.button)
-                    .map(transition =>
-                        <button key={transition.button} onClick={() => this.onButtonClick(transition)}>{transition.button}</button>
+        return (
+            <div className={container}>
+                <div className="wrapper">
+                    {previousStates.map(state =>
+                        <Message key={state.id} fields={fields} state={state}/>
                     )}
-                    
-                {state.transitions.filter(transition => transition.input)
-                    .map(transition =>
-                        <div key={transition.input}>
-                            <label>{transition.label}</label>
-                            <input type="text"
-                                   placeholder="enter it here"
-                                   onChange={e => updateField(transition.input, e.target.value)}
-                                   onKeyUp={e => this.onInputKeyPress(e, transition.nextState)}
-                            />
-                        </div>
-                    )
-                }
+
+                    <Message state={state} fields={fields}/>
+
+                    {state.transitions.filter(transition => transition.button)
+                        .map(transition =>
+                            <button key={transition.button} onClick={() => this.onButtonClick(transition)}>{transition.button}</button>
+                        )}
+
+                    {state.transitions.filter(transition => transition.input)
+                        .map(transition =>
+                            <div key={transition.input}>
+                                <label>{transition.label}</label>
+                                <input type="text"
+                                       placeholder="enter it here"
+                                       onChange={e => updateField(transition.input, e.target.value)}
+                                       onKeyUp={e => this.onInputKeyPress(e, transition.nextState)}
+                                />
+                            </div>
+                        )
+                    }
+                </div>
             </div>
         );
     }
@@ -104,7 +121,8 @@ const mapStateToProps = state => {
     return {
         states: state.states.states,
         currentState: state.states.currentState,
-        fields: state.states.fields
+        fields: state.states.fields,
+        history: state.states.history
     }
 };
 
