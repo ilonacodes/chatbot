@@ -20,6 +20,9 @@ export const renderMessage = (message, fields) => {
 };
 
 const Message = ({state, fields}) => {
+    if (state.component) {
+        return state.component({fields: fields})
+    }
 
     if (state.side === 'user') {
         return (
@@ -43,6 +46,11 @@ class ChatComponent extends React.Component {
     onButtonClick(transition) {
         if (transition.field) {
             this.props.updateField(transition.field, transition.button)
+        }
+
+        if (transition.submit) {
+            console.log('You have been successfully signed up!', this.props.fields);
+            return;
         }
 
         this.props.goToNextState(transition.nextState)
@@ -78,7 +86,7 @@ class ChatComponent extends React.Component {
                 {state.transitions.filter(transition => transition.input)
                     .map(transition =>
                         <div key={transition.input}>
-                            {transition.label}
+                            <label>{transition.label}</label>
                             <input type="text"
                                    placeholder="enter it here"
                                    onChange={e => updateField(transition.input, e.target.value)}

@@ -1,4 +1,5 @@
 import {t} from "./actions";
+import {Confirmation} from "./Confirmation";
 
 const initState = {
     currentState: 'greeting',
@@ -108,10 +109,10 @@ const initState = {
             id: 'generate-ideas',
             side: 'chatbot',
             message: 'Mind mapping fasters a free flow of ideas and helps spark new thoughts through association.' +
-                'It is perfect tool for creative brainstorming alone or in a team',
+                ' It is perfect tool for creative brainstorming alone or in a team',
             transitions: [
                 {
-                    delay: 2000,
+                    delay: 1000,
                     nextState: 'ready-to-give-it-to-try'
                 }
             ]
@@ -124,7 +125,7 @@ const initState = {
                 'progress using a simple task widget',
             transitions: [
                 {
-                    delay: 2000,
+                    delay: 1000,
                     nextState: 'ready-to-give-it-to-try'
                 }
             ]
@@ -136,7 +137,7 @@ const initState = {
                 'There is no need to download software or update it manually.',
             transitions: [
                 {
-                    delay: 2000,
+                    delay: 1000,
                     nextState: 'ready-to-give-it-to-try'
                 }
             ]
@@ -186,14 +187,14 @@ const initState = {
             transitions: [
                 {
                     delay: 1000,
-                    usageFor: 'usage-for-question'
+                    nextState: 'usage-for-question'
                 }
             ]
         },
         {
             id: 'usage-for-question',
             side: 'chatbot',
-            message: '$name$ what do you want to learn it for?',
+            message: '$name$, what do you want to learn it for?',
             transitions: [
                 {
                     button: 'Work',
@@ -219,7 +220,7 @@ const initState = {
             transitions: [
                 {
                     delay: 1000,
-                    nextState: 'where-should-I-send-tips-and-tricks'
+                    nextState: 'where-should-I-send-tips-and-advices'
                 }
             ]
         },
@@ -230,7 +231,7 @@ const initState = {
             transitions: [
                 {
                     delay: 1000,
-                    nextState: 'where-should-I-send-tips-and-tricks'
+                    nextState: 'where-should-I-send-tips-and-advices'
                 }
             ]
         },
@@ -241,11 +242,85 @@ const initState = {
             transitions: [
                 {
                     delay: 1000,
-                    nextState: 'where-should-I-send-tips-and-tricks'
+                    nextState: 'where-should-I-send-tips-and-advices'
+                }
+            ]
+        },
+        {
+            id: 'where-should-I-send-tips-and-advices',
+            side: 'chatbot',
+            message: 'Where should I send tips and advices?',
+            transitions: [
+                {
+                    input: 'email',
+                    label: 'My email ',
+                    nextState: 'where-should-I-send-tips-and-advices--replay'
+                }
+            ]
+        },
+        {
+            id: 'where-should-I-send-tips-and-advices--replay',
+            side: 'user',
+            message: 'My email is $email$',
+            transitions: [
+                {
+                    delay: 1000,
+                    nextState: 'related-articles-and-products'
+                }
+            ]
+        },
+        {
+            id: 'related-articles-and-products',
+            side: 'chatbot',
+            message: 'Thanks! Are you interested to hear about related articles and products?',
+            transitions: [
+                {
+                    button: 'Yes',
+                    nextState: 'related-articles-and-products--yes'
+                },
+                {
+                    button: 'No',
+                    nextState: 'related-articles-and-products--no'
+                }
+            ]
+        },
+        {
+            id: 'related-articles-and-products--yes',
+            side: 'user',
+            message: 'Yes',
+            transitions: [
+                {
+                    delay: 1000,
+                    nextState: 'confirmation'
+                }
+            ]
+        },
+        {
+            id: 'related-articles-and-products--no',
+            side: 'user',
+            message: 'No',
+            transitions: [
+                {
+                    delay: 1000,
+                    nextState: 'confirmation'
+                }
+            ]
+        },
+        {
+            id: 'confirmation',
+            side: 'chatbot',
+            component: Confirmation,
+            transitions: [
+                {
+                    button: 'Go for it!',
+                    submit: 'true'
+                },
+                {
+                    button: 'Start over',
+                    nextState: 'do-you-like-to-try'
                 }
             ]
         }
-
     ]
 };
 

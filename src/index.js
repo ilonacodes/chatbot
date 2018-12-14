@@ -3,15 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import {combineReducers, createStore} from "redux";
-import {statesReducer} from "./reducers";
 import {Provider} from "react-redux";
+import {initStore} from "./store";
 
-const store = createStore(
-    combineReducers({
-        states: statesReducer
-    })
-);
+const store = initStore();
 
 ReactDOM.render(
     <Provider store={store}>
